@@ -5,13 +5,14 @@ async function getWeather(country ){
     const response = await axios.get(url)
     const data = response.data;
         
+    const locationName = data.resolvedAddress;
     const temp = data.currentConditions.temp;
     const wind = data.currentConditions.windspeed;
     const condition = data.currentConditions.conditions;
     const rainProb = data.currentConditions.precipprob;
 
     document.getElementById("weatherCurrent").innerHTML = `
-    <h2>Current Weather</h2>
+    <h2>Current Weather In ${locationName}</h2>
     <p>Temperature: ${temp}°C</p>
     <p>Wind Speed: ${wind} km/h</p>
     <p>Rain Probability: ${rainProb}%</p>
