@@ -42,7 +42,7 @@ body {
     border: solid, black;
     flex-direction: column;
     justify-items: center;
-    padding: 1rem, 2rem; 
+    padding-bottom: 2rem;
 
 }
 
