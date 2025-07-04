@@ -11,9 +11,38 @@ body {
     background-size: cover;
 }
 
-#appName{
+#centerOb{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 
-    color: blue;
+*{
+    color: aliceblue;
+}
 
+#locationInp{
+    color: black;
+}
+
+#weatherCurrent{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#weatherDit{
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+}
+
+.weatherInfo{ 
+    border: solid, black;
+    flex-direction: column;
+    justify-items: center;
+    padding: 1rem, 2rem; 
 
 }
+
