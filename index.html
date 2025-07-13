@@ -10,14 +10,37 @@
 <body>
     <div id="centerOb">
         <h1 id="appName">Weather Web App</h1>
-        <input placeholder="Location" id="locationInp"/>
-        <button id="searchBtn" type="button">Search</button>
-
-        <div id="weatherCurrent"></div>
-        <div id="weatherHourly"></div>
+        <div class="search-bar"   >
+            <input type="text" placeholder="Enter city..." id="locationInp"/>
+            <button id="searchBtn" type="button">Search</button>
+        </div>
+        <div id="containerLoader">
+            <span class="loader"></span>
+        </div>
+            
     </div>
 
+    <h2 class="location">Current Weather In <span id="locationName">Your City</span></h2>
 
+    <div class="weather-cards">
+      <div class="card">
+        <p>🌡️ Temperature</p>
+        <span id="temp">--°C</span>
+      </div>
+      <div class="card">
+        <p>💨 Wind Speed</p>
+        <span id="wind">-- km/h</span>
+      </div>
+      <div class="card">
+        <p>🌧️ Rain Probability</p>
+        <span id="rainProb">--%</span>
+      </div>
+      <div class="card">
+        <p>🌤️ Condition</p>
+        <span id="condition">--</span>
+      </div>
+    </div>
+  </div>
     <script src="app.js"></script>
 </body>
 </html>

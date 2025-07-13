@@ -1,46 +1,36 @@
-async function getWeather(country ){
-    const key = "C62FW4862G8P72BN3M2JBPMWG"
-    const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${country}?key=${key}&contentType=json`;
+    document.getElementById("searchBtn").addEventListener("click", async () => {
+        const location = document.getElementById("locationInp").value;
+        if (location !== "") {
+            getWeather(location);
+        } else {
+            alert("Please enter a location.");
+        }
+    }); 
 
-    const response = await axios.get(url)
-    const data = response.data;
-        
-    const locationName = data.resolvedAddress;
-    const temp = data.currentConditions.temp;
-    const wind = data.currentConditions.windspeed;
-    const condition = data.currentConditions.conditions;
-    const rainProb = data.currentConditions.precipprob;
+async function getWeather(country){
+        const loader = document.getElementById("containerLoader");
+        loader.style.display = "flex";
+            const key = "C62FW4862G8P72BN3M2JBPMWG"
+            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${country}?key=${key}&contentType=json`;
 
-    document.getElementById("weatherCurrent").innerHTML = `
-    <h2 id="weatherTitle" >Current Weather In ${locationName}</h2>
-        <div id="weatherDit">
-            <div class="weatherInfo">
-                <div class="label">Temperature:</div>
-                <div class="value">${temp}°C</div>
-            </div>
-            <div class="weatherInfo">
-                <div class="label">Wind Speed:</div>
-                <div class="value">${wind} km/h</div>
-            </div>
-            <div class="weatherInfo">
-                <div class="label">Rain Probability:</div>
-                <div class="value">${rainProb}%</div>
-            </div>
-            <div class="weatherInfo">
-                <div class="label">Condition:</div>
-                <div class="value">${condition}</div>
-            </div>
-        </div>
-    `;
+            const response = await axios.get(url)
+            const data = response.data;
+            
+            //await new Promise(res => setTimeout(res, 2000));
+            const locationName = data.resolvedAddress;
+            const temp = data.currentConditions.temp;
+            const wind = data.currentConditions.windspeed;
+            const condition = data.currentConditions.conditions;
+            const rainProb = data.currentConditions.precipprob;
+
+            document.getElementById("locationName").textContent = locationName;
+            document.getElementById("temp").textContent = temp + "°C";
+            document.getElementById("wind").textContent = wind + "km/h";
+            document.getElementById("rainProb").textContent = rainProb + "%";
+            document.getElementById("condition").textContent = condition;
+            loader.style.display = "none";
 
 }
 
 
-document.getElementById("searchBtn").addEventListener("click", async () => {
-    const location = document.getElementById("locationInp").value;
-    if (location !== "") {
-        getWeather(location);
-    } else {
-        alert("Please enter a location.");
-    }
-});
+
