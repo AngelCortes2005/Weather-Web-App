@@ -5,42 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Web App</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div id="centerOb">
-        <h1 id="appName">Weather Web App</h1>
-        <div class="search-bar"   >
-            <input type="text" placeholder="Enter city..." id="locationInp"/>
-            <button id="searchBtn" type="button">Search</button>
-        </div>
-        <div id="containerLoader">
-            <span class="loader"></span>
-        </div>
-            
-    </div>
-
-    <h2 class="location">Current Weather In <span id="locationName">Your City</span></h2>
-
-    <div class="weather-cards">
-      <div class="card">
-        <p>🌡️ Temperature</p>
-        <span id="temp">--°C</span>
-      </div>
-      <div class="card">
-        <p>💨 Wind Speed</p>
-        <span id="wind">-- km/h</span>
-      </div>
-      <div class="card">
-        <p>🌧️ Rain Probability</p>
-        <span id="rainProb">--%</span>
-      </div>
-      <div class="card">
-        <p>🌤️ Condition</p>
-        <span id="condition">--</span>
-      </div>
-    </div>
+<body>            
+  <div id="containerLoader">
+    <span class="loader"></span>
   </div>
+    <div id="container">
+        <div id="centerOb">
+            <h1 id="appName">Weather Web App</h1>
+            <div class="search-bar">
+                <input type="text" placeholder="Enter city..." id="locationInp"/>
+                <button id="searchBtn" type="button">Search</button>
+                <button id="refreshBtn" type="button" title="Refresh"><i class="fas fa-sync-alt"></i></button>
+            </div>
+
+        </div>
+
+        <h2 class="location">Current Weather In <span id="locationName">Your City</span></h2>
+
+        <div class="current-weather">
+            <div class="card">
+                <p><i class="fas fa-temperature-high"></i> Temperature</p>
+                <span id="temp" class="weather-data"></span>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-wind"></i> Wind Speed</p>
+                <span id="wind" class="weather-data"></span>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-cloud-rain"></i> Rain Probability</p>
+                <span id="rainProb" class="weather-data"></span>
+            </div>
+            <div class="card">
+                <p><i class="fas fa-sun"></i> Condition</p>
+                <span id="condition" class="weather-data"></span>
+            </div>
+        </div>
+
+        <div class="hourly-forecast">
+            <div class="time-section">
+                <h3><i class="fas fa-history"></i> Past 24 Hours</h3>
+                <div class="scroll-container" id="past24Hours"></div>
+            </div>
+            
+            <div class="time-section">
+                <h3><i class="fas fa-clock"></i> Next 24 Hours</h3>
+                <div class="scroll-container" id="next24Hours"></div>
+            </div>
+        </div>
+    </div>
+    
     <script src="app.js"></script>
 </body>
 </html>
