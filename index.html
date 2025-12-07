@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather Web App</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -42,6 +43,47 @@
                 <p><i class="fas fa-sun"></i> Condition</p>
                 <span id="condition" class="weather-data"></span>
             </div>
+        </div>
+
+        <div class="extra-info">
+            <div class="info-card">
+                <i class="fas fa-tint"></i>
+                <div class="info-content">
+                    <span class="info-label">Humidity</span>
+                    <span class="info-value" id="humidity">--%</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-eye"></i>
+                <div class="info-content">
+                    <span class="info-label">Visibility</span>
+                    <span class="info-value" id="visibility">-- km</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-compress-arrows-alt"></i>
+                <div class="info-content">
+                    <span class="info-label">Pressure</span>
+                    <span class="info-value" id="pressure">-- mb</span>
+                </div>
+            </div>
+            <div class="info-card">
+                <i class="fas fa-sun"></i>
+                <div class="info-content">
+                    <span class="info-label">UV Index</span>
+                    <span class="info-value" id="uvindex">--</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h3><i class="fas fa-chart-line"></i> Temperature Trend</h3>
+            <canvas id="tempChart"></canvas>
+        </div>
+
+        <div class="daily-forecast">
+            <h3><i class="fas fa-calendar-week"></i> 5-Day Forecast</h3>
+            <div class="days-container" id="daysContainer"></div>
         </div>
 
         <div class="hourly-forecast">

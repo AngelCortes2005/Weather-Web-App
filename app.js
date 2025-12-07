@@ -1,6 +1,7 @@
 // Variables globales
 let currentLocation = "";
 let weatherData = null;
+let favoriteLocations = JSON.parse(localStorage.getItem('favoriteLocations')) || [];
 
 window.onload = function() {
     if (navigator.geolocation) {
@@ -49,7 +50,35 @@ window.onload = function() {
             }
         }
     });
+
+    displayFavorites();
 };
+
+function addToFavorites(location) {
+    if (!favoriteLocations.includes(location)) {
+        favoriteLocations.push(location);
+        localStorage.setItem('favoriteLocations', JSON.stringify(favoriteLocations));
+        displayFavorites();
+    }
+}
+
+function displayFavorites() {
+    const container = document.getElementById('favoritesContainer');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    favoriteLocations.forEach(loc => {
+        const btn = document.createElement('button');
+        btn.className = 'favorite-btn';
+        btn.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${loc}`;
+        btn.onclick = () => {
+            currentLocation = loc;
+            getWeather(loc);
+        };
+        container.appendChild(btn);
+    });
+}
 
 async function getLocationName(lat, lon) {
     const loader = document.getElementById("containerLoader");
@@ -103,6 +132,8 @@ async function getWeather(location) {
         
         updateCurrentWeather(weatherData.current);
         update24HourForecast(weatherData);
+        updateDailyForecast(weatherData.current);
+        updateTemperatureChart(weatherData); // Nueva línea para actualizar gráfico
         
     } catch(error) {
         console.error("Error al obtener el clima:", error);
@@ -129,10 +160,38 @@ function updateCurrentWeather(data) {
     const current = data.currentConditions;
     
     document.getElementById("locationName").textContent = data.resolvedAddress;
-    document.getElementById("temp").textContent = `${Math.round(current.temp)}°C`;
-    document.getElementById("wind").textContent = `${Math.round(current.windspeed)} km/h`;
-    document.getElementById("rainProb").textContent = `${current.precipprob ?? 0}%`;
+    
+    // Animación de números
+    animateValue("temp", 0, Math.round(current.temp), 1000, "°C");
+    animateValue("wind", 0, Math.round(current.windspeed), 1000, " km/h");
+    animateValue("rainProb", 0, current.precipprob ?? 0, 1000, "%");
+    
     document.getElementById("condition").textContent = current.conditions;
+    
+    // Nuevos datos
+    document.getElementById("humidity").textContent = Math.round(current.humidity) + "%";
+    document.getElementById("visibility").textContent = Math.round(current.visibility) + " km";
+    document.getElementById("pressure").textContent = Math.round(current.pressure) + " mb";
+    document.getElementById("uvindex").textContent = current.uvindex ?? 0;
+    
+    updateThemeByWeather(current.conditions, current.temp);
+}
+
+// Nueva función para animar números
+function animateValue(id, start, end, duration, suffix = "") {
+    const element = document.getElementById(id);
+    const range = end - start;
+    const increment = range / (duration / 16);
+    let current = start;
+    
+    const timer = setInterval(() => {
+        current += increment;
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+            current = end;
+            clearInterval(timer);
+        }
+        element.textContent = Math.round(current) + suffix;
+    }, 16);
 }
 
 function update24HourForecast(data) {
@@ -203,4 +262,200 @@ function getWeatherIcon(conditions) {
     } else {
         return conditions;
     }
+}
+
+function updateThemeByWeather(conditions, temp) {
+    const root = document.documentElement;
+    const body = document.body;
+    
+    const condition = conditions.toLowerCase();
+    
+    if (condition.includes('clear') || condition.includes('sun')) {
+        // Día soleado
+        root.style.setProperty('--primary-bg', 'linear-gradient(135deg, #FFB75E 0%, #ED8F03 100%)');
+    } else if (condition.includes('rain')) {
+        // Lluvioso
+        root.style.setProperty('--primary-bg', 'linear-gradient(135deg, #4B79A1 0%, #283E51 100%)');
+    } else if (condition.includes('cloud')) {
+        // Nublado
+        root.style.setProperty('--primary-bg', 'linear-gradient(135deg, #757F9A 0%, #D7DDE8 100%)');
+    } else if (condition.includes('snow')) {
+        // Nevado
+        root.style.setProperty('--primary-bg', 'linear-gradient(135deg, #E0EAFC 0%, #CFDEF3 100%)');
+    } else if (condition.includes('storm') || condition.includes('thunder')) {
+        // Tormenta
+        root.style.setProperty('--primary-bg', 'linear-gradient(135deg, #2C3E50 0%, #000000 100%)');
+    }
+    
+    // Cambiar según temperatura
+    if (temp > 30) {
+        root.style.setProperty('--accent-color', '#ff6b6b');
+    } else if (temp < 10) {
+        root.style.setProperty('--accent-color', '#4ecdc4');
+    }
+}
+
+// Nueva función para actualizar el pronóstico diario
+function updateDailyForecast(data) {
+    const container = document.getElementById('daysContainer');
+    container.innerHTML = '';
+    
+    const days = data.days.slice(1, 6); // Próximos 5 días
+    
+    days.forEach(day => {
+        const date = new Date(day.datetime);
+        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+        
+        const dayCard = document.createElement('div');
+        dayCard.className = 'day-card';
+        dayCard.innerHTML = `
+            <div class="day-name">${dayName}</div>
+            <div class="day-icon">${getWeatherIcon(day.conditions)}</div>
+            <div class="day-temps">
+                <span class="temp-max">${Math.round(day.tempmax)}°</span>
+                <span class="temp-min">${Math.round(day.tempmin)}°</span>
+            </div>
+            <div class="day-condition">${day.conditions}</div>
+            <div class="day-rain"><i class="fas fa-tint"></i> ${day.precipprob ?? 0}%</div>
+        `;
+        container.appendChild(dayCard);
+    });
+}
+
+// Agregar al final
+
+function toggleTheme() {
+    const isDark = document.body.classList.toggle('light-mode');
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+}
+
+// Al cargar
+if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+}
+
+// Nueva función para actualizar el gráfico de temperatura
+let temperatureChart = null;
+
+function updateTemperatureChart(data) {
+    const canvas = document.getElementById('tempChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destruir gráfico anterior si existe
+    if (temperatureChart) {
+        temperatureChart.destroy();
+    }
+    
+    // Obtener datos de los próximos 5 días
+    const days = data.current.days.slice(1, 6);
+    const labels = days.map(day => {
+        const date = new Date(day.datetime);
+        return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    });
+    const tempMax = days.map(day => Math.round(day.tempmax));
+    const tempMin = days.map(day => Math.round(day.tempmin));
+    
+    // Crear nuevo gráfico
+    temperatureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Max Temp (°C)',
+                data: tempMax,
+                borderColor: 'rgba(255, 107, 107, 1)',
+                backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: 'rgba(255, 107, 107, 1)',
+                pointBorderWidth: 2
+            }, {
+                label: 'Min Temp (°C)',
+                data: tempMin,
+                borderColor: 'rgba(78, 205, 196, 1)',
+                backgroundColor: 'rgba(78, 205, 196, 0.2)',
+                fill: true,
+                tension: 0.4,
+                borderWidth: 3,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#fff',
+                pointBorderColor: 'rgba(78, 205, 196, 1)',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: '#fff',
+                        font: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.3)',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y + '°C';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        font: {
+                            size: 12,
+                            weight: '600'
+                        },
+                        callback: function(value) {
+                            return value + '°C';
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)',
+                        drawBorder: false
+                    },
+                    min: Math.min(...tempMin) - 5,
+                    max: Math.max(...tempMax) + 5
+                }
+            }
+        }
+    });
 }
